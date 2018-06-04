@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 
 module.exports = {
+  devtool: 'source-map',
   entry: [
     'react-hot-loader/patch',
     './src/index.js'
@@ -11,7 +12,28 @@ module.exports = {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
         use: ['babel-loader']
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
+     },
+     {
+      test: /\.(eot|woff2?|ttf|otf)(\?.*)?$/i,
+      loader: 'url-loader',
+      query: {
+        limit: 5120,
+        name: '[name].[hash].[ext]'
       }
+    },
+
+    {
+      test: /\.(jpe?g|png|gif|svg)(\?.*)?$/i,
+      loader: 'url-loader',
+      query: {
+        limit: 5120,
+        name: '[name].[hash].[ext]'
+      }
+    }
     ]
   },
   resolve: {
@@ -22,11 +44,7 @@ module.exports = {
     publicPath: '/',
     filename: 'bundle.js'
   },
-  plugins: [
-    new webpack.HotModuleReplacementPlugin()
-  ],
   devServer: {
-    contentBase: './dist',
-    hot: true
+    contentBase: './dist'
   }
 };

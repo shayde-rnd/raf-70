@@ -144,7 +144,7 @@ class ResultsDialog extends Component {
           onClose={this.handleClose}>
           <Container>
               { this.renderProgress(guess, 'Your guess')}
-              { this.renderProgress(avarage, 'Avarage')}
+              { this.renderProgress(avarage, `Avarage (${((this.getStatusFromStorage() || {}).attempts || 0) + 1} attempts)`)}
               { this.renderProgress(actual, 'Reality')}
             </Container>
         </Dialog>);
@@ -166,7 +166,12 @@ export default withStyles({
   paper: {
     width: '900px',
     height: '800px',
-    backgroundColor: '#bce3e0',
+    backgroundImage: `linear-gradient(45deg, #356d4d 25%, transparent 25%), 
+                      linear-gradient(-45deg, #356d4d 25%, transparent 25%), 
+                      linear-gradient(45deg, transparent 35%, #356d4d 75%), 
+                      linear-gradient(-45deg, transparent 35%, #356d4d 75%)`,
+    backgroundSize: '2px 2px',
+    backgroundPosition: '0 0, 1px 0, 1px -1px, 0px 1px',
     padding: '0px'
   }
 })(ResultsDialog);

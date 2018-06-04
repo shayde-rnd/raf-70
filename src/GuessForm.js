@@ -8,14 +8,24 @@ import Label from './Label'
 import Input from './Input'
 import ResultsDialog from './ResultsDialog'
 
+
 const Container = styled.div`
+flex: 6;
 display: flex;
 flex-direction: column;
 align-items: center;
 justify-content: center;
-background-color: #91f5ed;
 height: 100%;
+background-image: linear-gradient(45deg, #356d4d 25%, transparent 25%), 
+    linear-gradient(-45deg, #356d4d 25%, transparent 25%), 
+    linear-gradient(45deg, transparent 45%, #356d4d 75%), 
+    linear-gradient(-45deg, transparent 45%, #356d4d 75%);
+background-size: 2px 2px;
+background-position: 0 0, 1px 0, 1px -1px, 0px 1px;
+`;
 
+const StyledLabel = styled(Label)`
+margin: 20px;
 `;
 
 class GuessForm extends Component {
@@ -48,6 +58,7 @@ class GuessForm extends Component {
   render() {
     return (
       <Container>
+        <StyledLabel>Wisdom Of Crowed</StyledLabel>
         <Avatar className={this.props.classes.avatar}>?</Avatar>
         <Label>What's your guess</Label>
         <Input value={this.state.input}/>

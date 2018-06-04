@@ -20,6 +20,7 @@ height: 100%;
 `
 
 const OuterContainer = styled.div`
+flex: 4;
 display: flex;
 flex-direction: row;
 align-items: center;

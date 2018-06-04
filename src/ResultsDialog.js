@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types'
+import { flow, set, getOr } from 'lodash/fp';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -36,6 +37,7 @@ const progressTransition = {
 }
 
 const MAX_PROGRESS = 600;
+const ACTUAL_COUNT = 328;
 
 function Transition(props) {
   return <Slide direction="up" {...props} />;
@@ -45,21 +47,37 @@ class ResultsDialog extends Component {
 
   componentWillMount(){
 
-    const statusFromLocalStorage = this.getStatusFromStorage();
-    const attempts = (statusFromLocalStorage.attempts || 0)
-    const avarage = Number(statusFromLocalStorage.avarage || this.props.guess)
+    const status = this.getStatus();
+    const avarage = Number(status.avarage || this.props.guess)
 
     this.setState({
       progress: 0,
       avarage,// TODO from localstorage
-      actual: 328
+      actual: ACTUAL_COUNT
     });
     this.timer = null;
     this.currentProgress = 'guess'
   }
 
-  getStatusFromStorage = () => {
-    return JSON.parse(localStorage.getItem('guessStatus') || '{}')
+  getStatus = () => {
+    const status = JSON.parse(localStorage.getItem('guessStatus') || '{}');
+    return flow([
+      set('attempts', getOr(0, 'attempts', status)),
+      set('avarage', getOr(0, 'avarage', status))
+    ])(status)
+  }
+
+  updateStatus = () => {
+    const status = this.getStatus();
+    const attempts = this.props.guess !== '' ? status.attempts + 1 : status.attempts;
+    const avarage = this.props.guess !== '' ? 
+          ((status.avarage * status.attempts) + Number(this.props.guess)) / attempts : 
+          status.avarage || this.props.guess;
+
+    localStorage.setItem('guessStatus', JSON.stringify({
+      avarage,
+      attempts
+    }));
   }
 
   setProgressTimer = () => {
@@ -71,14 +89,7 @@ class ResultsDialog extends Component {
   }
 
   componentWillUnmount() {
-    const statusFromLocalStorage = this.getStatusFromStorage();
-    const attempts = (statusFromLocalStorage.attempts || 0) + 1
-    const avarage = this.props.guess !== '' ? (((statusFromLocalStorage.avarage || 0) * (statusFromLocalStorage.attempts || 0)) + Number(this.props.guess)) / attempts : 
-                                              statusFromLocalStorage.avarage || this.props.guess
-    localStorage.setItem('guessStatus', JSON.stringify({
-      avarage,
-      attempts
-    }))
+    this.updateStatus()
     clearInterval(this.timer);
   }
 
@@ -121,6 +132,7 @@ class ResultsDialog extends Component {
     let guess = 0;
     let avarage = 0;
     let actual = 0;
+    const attempts = this.props.guess !== '' ? this.getStatus().attempts + 1 : this.getStatus().attempts
 
     if(this.currentProgress === 'guess'){
       guess = this.state.progress;
@@ -144,7 +156,7 @@ class ResultsDialog extends Component {
           onClose={this.handleClose}>
           <Container>
               { this.renderProgress(guess, 'Your guess')}
-              { this.renderProgress(avarage, `Avarage (${((this.getStatusFromStorage() || {}).attempts || 0) + 1} attempts)`)}
+              { this.renderProgress(avarage, `Avarage (${attempts} attempts)`)}
               { this.renderProgress(actual, 'Reality')}
             </Container>
         </Dialog>);

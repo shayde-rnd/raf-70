@@ -71,6 +71,7 @@ class ResultsDialog extends Component {
 
   componentWillUnmount() {
     clearInterval(this.timer);
+    clearTimeout(this.closeTimer)
   }
 
   progress = () => {
@@ -87,7 +88,7 @@ class ResultsDialog extends Component {
         this.setProgressTimer()
       } else {
         this.setState({showContribution: true})
-        setTimeout(() => {
+        this.closeTimer = setTimeout(() => {
           this.props.handleClose()
         }, 4000);
       }

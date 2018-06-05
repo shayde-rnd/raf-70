@@ -12,6 +12,7 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import Avatar from '@material-ui/core/Avatar';
 import { withStyles } from '@material-ui/core/styles';
 import Label from './Label'
+import WisdomContribution from './WisdomContribution'
 import * as dataProvider from './dataProvider'
 
 const Container = styled.div`
@@ -134,7 +135,8 @@ class ResultsDialog extends Component {
           <Container>
               { this.renderProgress(guess, 'Your guess')}
               { this.renderProgress(avarage, `Avarage (${attempts} attempts)`)}
-            </Container>
+              <WisdomContribution guess= { this.props.guess }/>
+          </Container>
         </Dialog>);
       }
 }

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types'
-import { flow, set, getOr } from 'lodash/fp';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -10,14 +9,17 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
 import styled from 'styled-components';
 import LinearProgress from '@material-ui/core/LinearProgress';
+import Avatar from '@material-ui/core/Avatar';
 import { withStyles } from '@material-ui/core/styles';
 import Label from './Label'
+import * as dataProvider from './dataProvider'
 
 const Container = styled.div`
+margin-top: 30px;
 display: flex;
 flex-direction: column;
 align-items: center;
-justify-content: center;
+justify-content: flex-start;
 height: 100%;
 `;
 
@@ -30,14 +32,13 @@ justify-content: center;
 margin: 0px 0px 80px 0px;
 `
 
-
-const progressTransition = {
-  guess: 'avarage',
-  avarage: 'actual'
-}
-
-const MAX_PROGRESS = 600;
-const ACTUAL_COUNT = 328;
+const ProgressContainer = styled.div`
+position: relative;
+display: flex;
+width: 100%;
+flex-direction: row;
+justify-content: center;
+`
 
 function Transition(props) {
   return <Slide direction="up" {...props} />;
@@ -47,37 +48,16 @@ class ResultsDialog extends Component {
 
   componentWillMount(){
 
-    const status = this.getStatus();
+    const status = dataProvider.getStatus();
     const avarage = Number(status.avarage || this.props.guess)
 
     this.setState({
       progress: 0,
       avarage,// TODO from localstorage
-      actual: ACTUAL_COUNT
+      actual: status.actual
     });
     this.timer = null;
     this.currentProgress = 'guess'
-  }
-
-  getStatus = () => {
-    const status = JSON.parse(localStorage.getItem('guessStatus') || '{}');
-    return flow([
-      set('attempts', getOr(0, 'attempts', status)),
-      set('avarage', getOr(0, 'avarage', status))
-    ])(status)
-  }
-
-  updateStatus = () => {
-    const status = this.getStatus();
-    const attempts = this.props.guess !== '' ? status.attempts + 1 : status.attempts;
-    const avarage = this.props.guess !== '' ? 
-          ((status.avarage * status.attempts) + Number(this.props.guess)) / attempts : 
-          status.avarage || this.props.guess;
-
-    localStorage.setItem('guessStatus', JSON.stringify({
-      avarage,
-      attempts
-    }));
   }
 
   setProgressTimer = () => {
@@ -89,23 +69,19 @@ class ResultsDialog extends Component {
   }
 
   componentWillUnmount() {
-    this.updateStatus()
     clearInterval(this.timer);
   }
 
-  handleClose = () => {
-    this.props.handleClose()
-  }
-
   progress = () => {
+    const maxProgress = dataProvider.getStatus().actual * 2
     let currentLimit = this.currentProgress === 'guess' ? this.props.guess : this.state[this.currentProgress]
-    if(currentLimit > MAX_PROGRESS){
-      currentLimit = MAX_PROGRESS
+    if(currentLimit > maxProgress){
+      currentLimit = maxProgress
     }
-    if (this.state.progress >= Math.round( (currentLimit / MAX_PROGRESS) * 100)) {
+    if (this.state.progress >= Math.round( (currentLimit / maxProgress) * 100)) {
       clearInterval(this.timer);
-      if(this.currentProgress !== 'actual'){
-        this.currentProgress = progressTransition[this.currentProgress];
+      if(this.currentProgress !== 'avarage'){
+        this.currentProgress = 'avarage';
         this.setState({ progress: 0 });
         this.setProgressTimer()
       }
@@ -118,11 +94,14 @@ class ResultsDialog extends Component {
     return (
       <TupleContainer>
         <Label>{title}</Label>
-        <LinearProgress 
-          variant="determinate"
-          color="secondary" 
-          value={value}
-          className={this.props.classes.myGuess}/>
+        <ProgressContainer>
+          <Avatar className={this.props.classes.avatar}/>
+          <LinearProgress 
+            variant="determinate"
+            color="secondary" 
+            value={value}
+            className={this.props.classes.progress}/>
+        </ProgressContainer>
       </TupleContainer>
     )
   }
@@ -132,19 +111,17 @@ class ResultsDialog extends Component {
     let guess = 0;
     let avarage = 0;
     let actual = 0;
-    const attempts = this.props.guess !== '' ? this.getStatus().attempts + 1 : this.getStatus().attempts
+    const maxProgress = dataProvider.getStatus().actual * 2
+    const currentAttempts = dataProvider.getStatus().attempts;
+    const attempts = this.props.guess !== '' ? currentAttempts + 1 : currentAttempts
 
     if(this.currentProgress === 'guess'){
       guess = this.state.progress;
     }
+
     if(this.currentProgress === 'avarage'){
-      guess = Math.round( (this.props.guess / MAX_PROGRESS) * 100);
+      guess = Math.round( (this.props.guess / maxProgress) * 100);
       avarage = this.state.progress;
-    }
-    if(this.currentProgress === 'actual'){
-      guess = Math.round( (this.props.guess / MAX_PROGRESS) * 100);;
-      avarage = Math.round( (this.state.avarage / MAX_PROGRESS) * 100);
-      actual = this.state.progress;
     }
     
     return (
@@ -153,11 +130,10 @@ class ResultsDialog extends Component {
           classes={{paper: this.props.classes.paper}}
           TransitionComponent={Transition}
           open={true}
-          onClose={this.handleClose}>
+          onClose={() => this.props.handleClose()}>
           <Container>
               { this.renderProgress(guess, 'Your guess')}
               { this.renderProgress(avarage, `Avarage (${attempts} attempts)`)}
-              { this.renderProgress(actual, 'Reality')}
             </Container>
         </Dialog>);
       }
@@ -169,21 +145,24 @@ ResultsDialog.propTypes = {
 }
 
 export default withStyles({
-  myGuess:{
+  avatar: {
+    zIndex: 1,
+    left: '50%',
+    position: 'absolute',
+    backgroundColor: 'black',
+    width: '20px',
+    height: '20px'
+  },
+  progress:{
     width: '80%',
-    height: '10px',
+    height: '20px',
+    border: "1px solid black",
     backgroundColor: 'white',
-    borderRadius: '4px'
+    borderRadius: '6px'
   },
   paper: {
     width: '900px',
     height: '800px',
-    backgroundImage: `linear-gradient(45deg, #356d4d 25%, transparent 25%), 
-                      linear-gradient(-45deg, #356d4d 25%, transparent 25%), 
-                      linear-gradient(45deg, transparent 35%, #356d4d 75%), 
-                      linear-gradient(-45deg, transparent 35%, #356d4d 75%)`,
-    backgroundSize: '2px 2px',
-    backgroundPosition: '0 0, 1px 0, 1px -1px, 0px 1px',
     padding: '0px'
   }
 })(ResultsDialog);

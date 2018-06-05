@@ -8,15 +8,7 @@ import Label from './Label'
 import Input from './Input'
 import ResultsDialog from './ResultsDialog'
 import NumbersPad from './NumbersPad'
-
-/**
- * background-image: linear-gradient(45deg, #356d4d 25%, transparent 25%), 
-    linear-gradient(-45deg, #356d4d 25%, transparent 25%), 
-    linear-gradient(45deg, transparent 45%, #356d4d 75%), 
-    linear-gradient(-45deg, transparent 45%, #356d4d 75%);
-background-size: 2px 2px;
-background-position: 0 0, 1px 0, 1px -1px, 0px 1px;
- */
+import * as dataProvider from './dataProvider'
 
 const Container = styled.div`
 display: flex;
@@ -57,6 +49,7 @@ class GuessForm extends Component {
   }
 
   handleShowResults = () => {
+    dataProvider.updateStatus(this.state.input);
     this.setState({
       resultsDialogOpen: !this.state.resultsDialogOpen
     })

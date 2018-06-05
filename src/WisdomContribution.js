@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types'
+import Avatar from '@material-ui/core/Avatar';
 import Label from './Label'
 import styled from 'styled-components';
 import * as dataProvider from './dataProvider'
@@ -17,6 +18,13 @@ const StyledLabel = styled(Label)`
 color: green;
 `;
 
+const contributionGrade = {
+  wow: {text: "WOW", icon: "very-happy.svg"},
+  fantastic: {text: "Fantastic", icon: "happy.svg"},
+  nice: {text: "Nice", icon: "wink.svg"},
+  areYouSerious: {text: "Are you serious?", icon: "unhappy.svg"}
+}
+
 class WisdomContribution extends Component {
 
   constructor() {
@@ -26,29 +34,33 @@ class WisdomContribution extends Component {
   getWisdomContribution = () => {
     const status = dataProvider.getStatus();
     if(!this.props.guess){
-      return null
+      return {}
     }
     const delta = Math.abs(this.props.guess - status.actual)
     if(delta === 0){
-      return "WOW"
+      return contributionGrade.wow
     }
     if(delta < 50){
-      return "Fantastic"
+      return contributionGrade.fantastic
     }
-    if(delta < 100){
-      return "Nice"
+    if(delta < 150){
+      return contributionGrade.nice
     }
-    return "Are you serious?"
+    return contributionGrade.areYouSerious
   }
 
   render() {
     if(!this.props.guess){
       return null;
     }
+    const contribution = this.getWisdomContribution();
     return (
     <Container>
       <Label>Your Wisdom Contribution</Label>
-      <StyledLabel marginTop="20px">{this.getWisdomContribution()}</StyledLabel>
+      <StyledLabel marginTop="20px">{contribution.text}</StyledLabel>
+      <Avatar
+        src={contribution.icon}
+      />
     </Container>)
   }
 }

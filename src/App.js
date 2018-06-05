@@ -1,13 +1,23 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import GuessForm from './GuessForm'
-import NumbersPad from './NumbersPad'
 
 const Layout = styled.div`
 display: flex;
 flex-direction: column;
 justify-content: center;
 height: 100%;
+position: relative;
+`;
+
+const Background = styled.div`
+width: 100%;
+height: 100%;
+position: absolute;
+background-image: url("candy-can.jpg");
+background-repeat: no-repeat;
+background-size: cover;
+opacity: 0.5;
 `;
 
 class App extends Component {
@@ -21,12 +31,8 @@ class App extends Component {
   render() {
     return (
     <Layout>
+      <Background/>
       <GuessForm numberFromPad={this.state.numberFromPad}/>
-      <NumbersPad handleClick={ (numberFromPad) => {
-        this.setState({
-          numberFromPad
-        })
-      }}/>
     </Layout>
     )
   }

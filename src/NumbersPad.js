@@ -15,26 +15,16 @@ const ContainerPad = styled.div`
 display: flex;
 flex-direction: column;
 align-items: center;
-justify-content: center;
-height: 100%;
-`
-
-const OuterContainer = styled.div`
-flex: 4;
-display: flex;
-flex-direction: row;
-align-items: center;
-justify-content: center;
-height: 100%;
-`
+justify-content: flex-start;
+height: 400px;`
 
 const styles = theme => ({
   button: {
-    margin: '15px',
+    margin: '12px',
     backgroundColor: 'transparent',
     border: '1px solid black',
-    width: '80px',
-    height: '80px',
+    width: '70px',
+    height: '70px',
     fontWeight: 'bold'
   },
   input: {
@@ -53,12 +43,11 @@ const NumbersPad = ({classes, handleClick}) => {
     </Button>)
   
   return (
-    <OuterContainer>
-      <ContainerPad>
+    <ContainerPad>
       <Row>
-          {renderButton(1)}
-          {renderButton(2)}
-          {renderButton(3)}
+          {renderButton(7)}
+          {renderButton(8)}
+          {renderButton(9)}
       </Row>
       <Row>
           {renderButton(4)}
@@ -66,16 +55,15 @@ const NumbersPad = ({classes, handleClick}) => {
           {renderButton(6)}
       </Row>
       <Row>
-          {renderButton(7)}
-          {renderButton(8)}
-          {renderButton(9)}
+          {renderButton(1)}
+          {renderButton(2)}
+          {renderButton(3)}
       </Row>
       <Row align="space-between">
           {renderButton(0)}
           {renderButton('X')}
       </Row>
     </ContainerPad>
-    </OuterContainer>
     )
 };
 

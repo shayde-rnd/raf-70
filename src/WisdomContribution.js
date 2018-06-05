@@ -12,9 +12,9 @@ justify-content: flex-start;
 align-items: center;
 margin-top: ${({marginTop}) => marginTop || '60px'};
 `;
-
+ // color: #f50057;
 const StyledLabel = styled(Label)`
-color: #f50057;
+color: green;
 `;
 
 class WisdomContribution extends Component {

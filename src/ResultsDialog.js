@@ -85,6 +85,11 @@ class ResultsDialog extends Component {
         this.currentProgress = 'avarage';
         this.setState({ progress: 0 });
         this.setProgressTimer()
+      } else {
+        this.setState({showContribution: true})
+        setTimeout(() => {
+          this.props.handleClose()
+        }, 4000);
       }
     } else {
       this.setState({ progress: this.state.progress + 10 });
@@ -135,7 +140,10 @@ class ResultsDialog extends Component {
           <Container>
               { this.renderProgress(guess, 'Your guess')}
               { this.renderProgress(avarage, `Avarage (${attempts} attempts)`)}
-              <WisdomContribution guess= { this.props.guess }/>
+              {
+                this.state.showContribution && 
+                <WisdomContribution guess= { this.props.guess }/>
+              }
           </Container>
         </Dialog>);
       }

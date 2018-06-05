@@ -9,7 +9,12 @@ display: flex;
 flex-direction: column;
 width: 80%;
 justify-content: flex-start;
-margin-top: ${({marginTop}) => marginTop || '80px'};
+align-items: center;
+margin-top: ${({marginTop}) => marginTop || '60px'};
+`;
+
+const StyledLabel = styled(Label)`
+color: #f50057;
 `;
 
 class WisdomContribution extends Component {
@@ -42,8 +47,8 @@ class WisdomContribution extends Component {
     }
     return (
     <Container>
-      <Label>Your Wisdom Contribution:</Label>
-      <Label marginTop="20px">{this.getWisdomContribution()}</Label>
+      <Label>Your Wisdom Contribution</Label>
+      <StyledLabel marginTop="20px">{this.getWisdomContribution()}</StyledLabel>
     </Container>)
   }
 }
